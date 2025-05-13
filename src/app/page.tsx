@@ -151,7 +151,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <h1 className="text-3xl font-bold mb-6 text-green-900">EcoTrack 🌱</h1>
+      <div className="w-full max-w-4xl flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-green-900">EcoTrack 🌱</h1>
+        {result && recommendations && (
+          <PDFDownloadLink
+            document={<AirQualityReport 
+              location={location} 
+              data={result} 
+              recommendations={recommendations}
+              historicalData={historicalData}
+              forecast={forecast}
+            />}
+            fileName={`hava-kalitesi-raporu-${new Date().toISOString().split('T')[0]}.pdf`}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center gap-2"
+          >
+            {({ loading }) => (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                </svg>
+                {loading ? 'Rapor Hazırlanıyor...' : 'Tüm Verileri PDF İndir'}
+              </>
+            )}
+          </PDFDownloadLink>
+        )}
+      </div>
       
       {/* Favori Konumlar */}
       {favorites.length > 0 && (
@@ -249,29 +273,6 @@ export default function Home() {
 
             {/* Hava Kalitesi İstatistikleri */}
             <AirQualityStats data={result} />
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Hava Kalitesi Verileri</h2>
-                <PDFDownloadLink
-                  document={<AirQualityReport location={location} data={result} recommendations={recommendations} />}
-                  fileName={`hava-kalitesi-raporu-${new Date().toISOString().split('T')[0]}.pdf`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                >
-                  {({ loading }) => loading ? 'Rapor Hazırlanıyor...' : 'PDF İndir'}
-                </PDFDownloadLink>
-              </div>
-              <div className="flex flex-col gap-2 text-gray-800">
-                {result.aqi !== undefined && <div><b>AQI:</b> {result.aqi}</div>}
-                {result.pm2_5 !== undefined && <div><b>PM2.5:</b> {result.pm2_5} µg/m³</div>}
-                {result.pm10 !== undefined && <div><b>PM10:</b> {result.pm10} µg/m³</div>}
-                {result.co !== undefined && <div><b>CO:</b> {result.co} µg/m³</div>}
-                {result.no2 !== undefined && <div><b>NO₂:</b> {result.no2} µg/m³</div>}
-                {result.o3 !== undefined && <div><b>O₃:</b> {result.o3} µg/m³</div>}
-                {result.so2 !== undefined && <div><b>SO₂:</b> {result.so2} µg/m³</div>}
-                {result.time && <div className="text-xs text-gray-500 mt-2">Veri zamanı: {result.time}</div>}
-              </div>
-            </div>
 
             {historicalData && (
               <div className="bg-white rounded-lg shadow p-6">

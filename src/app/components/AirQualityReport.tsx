@@ -1,5 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
-import { AirQualityData, AirQualityRecommendation } from '../api';
+import { AirQualityData, AirQualityRecommendation, HistoricalAirQualityData, AirQualityForecast } from '../api';
 
 // Türkçe karakterleri destekleyen font tanımlaması
 Font.register({
@@ -66,9 +66,11 @@ interface AirQualityReportProps {
   location: string;
   data: AirQualityData;
   recommendations: AirQualityRecommendation;
+  historicalData?: HistoricalAirQualityData | null;
+  forecast?: AirQualityForecast | null;
 }
 
-const AirQualityReport = ({ location, data, recommendations }: AirQualityReportProps) => (
+const AirQualityReport = ({ location, data, recommendations, historicalData, forecast }: AirQualityReportProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>Hava Kalitesi Raporu</Text>
@@ -110,6 +112,30 @@ const AirQualityReport = ({ location, data, recommendations }: AirQualityReportP
           <Text style={styles.text}>{data.so2} µg/m³</Text>
         </View>
       </View>
+
+      {historicalData && (
+        <View style={styles.section}>
+          <Text style={styles.title}>Son 24 Saat Hava Kalitesi Değişimi</Text>
+          {historicalData.map((hour, index) => (
+            <View key={index} style={styles.dataRow}>
+              <Text style={styles.label}>{hour.time}:</Text>
+              <Text style={styles.text}>AQI: {hour.aqi}, PM2.5: {hour.pm2_5} µg/m³, PM10: {hour.pm10} µg/m³</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {forecast && (
+        <View style={styles.section}>
+          <Text style={styles.title}>Gelecek 24 Saat Tahmini</Text>
+          {forecast.map((hour, index) => (
+            <View key={index} style={styles.dataRow}>
+              <Text style={styles.label}>{hour.time}:</Text>
+              <Text style={styles.text}>AQI: {hour.aqi}, PM2.5: {hour.pm2_5} µg/m³, PM10: {hour.pm10} µg/m³</Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <View style={styles.section}>
         <Text style={styles.title}>Öneriler</Text>
