@@ -90,6 +90,10 @@ export default function Home() {
       }
       setCurrentCoords(coords);
       setDisplayLocation(loc);
+      
+      // Favori kontrolü
+      const isFav = isFavoriteLocation(coords.latitude, coords.longitude);
+      setIsFavorite(isFav);
 
       const [airQuality, historical, forecastData] = await Promise.all([
         getAirQuality(coords.latitude, coords.longitude),

@@ -203,7 +203,8 @@ export function removeFavoriteLocation(latitude: number, longitude: number): voi
 export function isFavoriteLocation(latitude: number, longitude: number): boolean {
   const favorites = getFavoriteLocations();
   return favorites.some(f => 
-    f.latitude === latitude && f.longitude === longitude
+    Number(f.latitude.toFixed(2)) === Number(latitude.toFixed(2)) && 
+    Number(f.longitude.toFixed(2)) === Number(longitude.toFixed(2))
   );
 }
 
