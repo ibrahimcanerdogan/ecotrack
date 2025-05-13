@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   getCoordinates, 
   getAirQuality, 
@@ -36,6 +36,9 @@ export default function Home() {
   const [currentCoords, setCurrentCoords] = useState<{latitude: number; longitude: number} | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [forecast, setForecast] = useState<AirQualityForecast | null>(null);
+  const [suggestions, setSuggestions] = useState<{name: string; latitude: number; longitude: number}[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   // Favori konumları yükle
   useEffect(() => {
@@ -48,6 +51,45 @@ export default function Home() {
       setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
     }
   }, [currentCoords]);
+
+  // Dışarı tıklandığında önerileri kapat
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Konum önerilerini al
+  const fetchSuggestions = async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=10&language=tr&format=json`
+      );
+      const data = await res.json();
+      if (data.results) {
+        // Benzersiz şehir isimlerini filtrele
+        const uniqueSuggestions = data.results.reduce((acc: any[], current: any) => {
+          const isDuplicate = acc.some(item => item.name === current.name);
+          if (!isDuplicate) {
+            acc.push(current);
+          }
+          return acc;
+        }, []).slice(0, 5); // En fazla 5 öneri göster
+
+        setSuggestions(uniqueSuggestions);
+      }
+    } catch (error) {
+      console.error("Öneriler alınamadı:", error);
+    }
+  };
 
   const getCurrentLocation = () => {
     setIsLocating(true);
@@ -247,19 +289,65 @@ export default function Home() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl mx-auto mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
             <div className="flex gap-3">
-              <div className="relative flex-1">
+              <div className="relative flex-1" ref={searchRef}>
                 <input
                   id="location"
                   type="text"
                   value={location}
-                  onChange={e => setLocation(e.target.value)}
+                  onChange={e => {
+                    setLocation(e.target.value);
+                    fetchSuggestions(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
                   placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm"
                   required
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
+                {location && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocation("");
+                      setSuggestions([]);
+                      setShowSuggestions(false);
+                      setResult(null);
+                      setRecommendations(null);
+                      setHistoricalData(null);
+                      setForecast(null);
+                      setCurrentCoords(null);
+                      setIsFavorite(false);
+                      setDisplayLocation("");
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                )}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+                    {suggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setLocation(suggestion.name);
+                          setShowSuggestions(false);
+                          fetchAirQuality(suggestion.name);
+                        }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none text-gray-900 flex items-center gap-2"
+                      >
+                        <span className="text-gray-400">📍</span>
+                        {suggestion.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
                 type="button"
