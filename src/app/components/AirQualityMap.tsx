@@ -51,9 +51,9 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
   ), [location, data.aqi, data.pm2_5, data.pm10]);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900">Hava Kalitesi Haritası</h2>
-      <div className="h-[400px] w-full rounded-lg overflow-hidden">
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900">Hava Kalitesi Haritası</h2>
+      <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200">
         <MapContainer
           center={center}
           zoom={13}
@@ -70,30 +70,22 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
           </Marker>
         </MapContainer>
       </div>
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
           <div className="w-4 h-4 rounded-full bg-[#00e400]" />
           <span className="text-sm font-medium text-gray-800">İyi (0-50)</span>
         </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
           <div className="w-4 h-4 rounded-full bg-[#ffd700]" />
           <span className="text-sm font-medium text-gray-800">Orta (51-100)</span>
         </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
           <div className="w-4 h-4 rounded-full bg-[#ff7e00]" />
           <span className="text-sm font-medium text-gray-800">Hassas (101-150)</span>
         </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
           <div className="w-4 h-4 rounded-full bg-[#ff0000]" />
           <span className="text-sm font-medium text-gray-800">Sağlıksız (151-200)</span>
-        </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
-          <div className="w-4 h-4 rounded-full bg-[#99004c]" />
-          <span className="text-sm font-medium text-gray-800">Çok Sağlıksız (201-300)</span>
-        </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
-          <div className="w-4 h-4 rounded-full bg-[#7e0023]" />
-          <span className="text-sm font-medium text-gray-800">Tehlikeli (301+)</span>
         </div>
       </div>
     </div>
