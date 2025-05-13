@@ -27,6 +27,13 @@ export type HistoricalAirQualityData = {
   aqi: number;
 }[];
 
+export type FavoriteLocation = {
+  name: string;
+  latitude: number;
+  longitude: number;
+  lastUpdated?: string;
+};
+
 // Basit bir geocoding için Open-Meteo'nun ücretsiz endpointi kullanılabilir
 export async function getCoordinates(location: string): Promise<{ latitude: number; longitude: number } | null> {
   // Eğer doğrudan koordinat girildiyse (örn: 41.0082,28.9784)
@@ -143,4 +150,48 @@ export async function getHistoricalAirQuality(lat: number, lon: number): Promise
     }));
   }
   return null;
+}
+
+// Favori konumları localStorage'dan al
+export function getFavoriteLocations(): FavoriteLocation[] {
+  if (typeof window === 'undefined') return [];
+  const favorites = localStorage.getItem('favoriteLocations');
+  return favorites ? JSON.parse(favorites) : [];
+}
+
+// Favori konum ekle
+export function addFavoriteLocation(location: FavoriteLocation): void {
+  const favorites = getFavoriteLocations();
+  
+  // Aynı koordinatlara sahip konum var mı kontrol et
+  const isDuplicate = favorites.some(f => 
+    Math.abs(f.latitude - location.latitude) < 0.01 && 
+    Math.abs(f.longitude - location.longitude) < 0.01
+  );
+
+  // Eğer aynı konum varsa, işlemi iptal et
+  if (isDuplicate) {
+    return;
+  }
+
+  // Yeni konumu ekle
+  favorites.push({ ...location, lastUpdated: new Date().toISOString() });
+  localStorage.setItem('favoriteLocations', JSON.stringify(favorites));
+}
+
+// Favori konum sil
+export function removeFavoriteLocation(latitude: number, longitude: number): void {
+  const favorites = getFavoriteLocations();
+  const newFavorites = favorites.filter(f => 
+    !(f.latitude === latitude && f.longitude === longitude)
+  );
+  localStorage.setItem('favoriteLocations', JSON.stringify(newFavorites));
+}
+
+// Konum favori mi kontrol et
+export function isFavoriteLocation(latitude: number, longitude: number): boolean {
+  const favorites = getFavoriteLocations();
+  return favorites.some(f => 
+    f.latitude === latitude && f.longitude === longitude
+  );
 } 

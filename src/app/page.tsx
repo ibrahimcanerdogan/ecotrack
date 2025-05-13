@@ -1,6 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getCoordinates, getAirQuality, AirQualityData, getAirQualityRecommendations, AirQualityRecommendation, getHistoricalAirQuality, HistoricalAirQualityData } from "./api";
+import { 
+  getCoordinates, 
+  getAirQuality, 
+  AirQualityData, 
+  getAirQualityRecommendations, 
+  AirQualityRecommendation, 
+  getHistoricalAirQuality, 
+  HistoricalAirQualityData,
+  FavoriteLocation,
+  getFavoriteLocations,
+  addFavoriteLocation,
+  removeFavoriteLocation,
+  isFavoriteLocation
+} from "./api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
@@ -11,8 +24,22 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isLocating, setIsLocating] = useState(false);
+  const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);
+  const [currentCoords, setCurrentCoords] = useState<{latitude: number; longitude: number} | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  // Konum tespiti fonksiyonu
+  // Favori konumları yükle
+  useEffect(() => {
+    setFavorites(getFavoriteLocations());
+  }, []);
+
+  // Mevcut konum favori mi kontrol et
+  useEffect(() => {
+    if (currentCoords) {
+      setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
+    }
+  }, [currentCoords]);
+
   const getCurrentLocation = () => {
     setIsLocating(true);
     setError("");
@@ -27,6 +54,7 @@ export default function Home() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         setLocation(`${latitude},${longitude}`);
+        setCurrentCoords({ latitude, longitude });
         await fetchAirQuality(`${latitude},${longitude}`);
         setIsLocating(false);
       },
@@ -37,7 +65,6 @@ export default function Home() {
     );
   };
 
-  // Hava kalitesi verilerini çeken fonksiyon
   const fetchAirQuality = async (loc: string) => {
     setError("");
     setResult(null);
@@ -51,6 +78,7 @@ export default function Home() {
         setLoading(false);
         return;
       }
+      setCurrentCoords(coords);
       const [airQuality, historical] = await Promise.all([
         getAirQuality(coords.latitude, coords.longitude),
         getHistoricalAirQuality(coords.latitude, coords.longitude)
@@ -77,6 +105,26 @@ export default function Home() {
     await fetchAirQuality(location);
   };
 
+  const toggleFavorite = () => {
+    if (!currentCoords) return;
+
+    if (isFavorite) {
+      removeFavoriteLocation(currentCoords.latitude, currentCoords.longitude);
+      setIsFavorite(false);
+    } else {
+      // Koordinatları kısa formatta göster (2 ondalık basamak)
+      const shortLat = currentCoords.latitude.toFixed(2);
+      const shortLon = currentCoords.longitude.toFixed(2);
+      addFavoriteLocation({
+        name: `${shortLat}, ${shortLon}`,
+        latitude: currentCoords.latitude,
+        longitude: currentCoords.longitude
+      });
+      setIsFavorite(true);
+    }
+    setFavorites(getFavoriteLocations());
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good': return 'bg-green-100 text-green-800';
@@ -90,6 +138,28 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-blue-100 p-4">
       <h1 className="text-3xl font-bold mb-6 text-green-900">EcoTrack 🌱</h1>
+      
+      {/* Favori Konumlar */}
+      {favorites.length > 0 && (
+        <div className="w-full max-w-4xl mb-6">
+          <div className="bg-white rounded-lg shadow p-4">
+            <h2 className="text-lg font-semibold mb-3">Favori Konumlar</h2>
+            <div className="flex flex-wrap gap-2">
+              {favorites.map((fav, index) => (
+                <button
+                  key={index}
+                  onClick={() => fetchAirQuality(`${fav.latitude},${fav.longitude}`)}
+                  className="bg-green-50 hover:bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                >
+                  <span>📍</span>
+                  {fav.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md bg-white rounded-lg shadow p-6">
         <div className="flex gap-2">
           <input
@@ -110,14 +180,30 @@ export default function Home() {
             {isLocating ? "Konum Alınıyor..." : "📍"}
           </button>
         </div>
-        <button
-          type="submit"
-          className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
-          disabled={loading}
-        >
-          {loading ? "Sorgulanıyor..." : "Hava Kalitesini Göster"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="flex-1 bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
+            disabled={loading}
+          >
+            {loading ? "Sorgulanıyor..." : "Hava Kalitesini Göster"}
+          </button>
+          {currentCoords && (
+            <button
+              type="button"
+              onClick={toggleFavorite}
+              className={`px-4 py-2 rounded font-semibold transition ${
+                isFavorite 
+                  ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {isFavorite ? '★' : '☆'}
+            </button>
+          )}
+        </div>
       </form>
+
       <div className="mt-8 w-full max-w-4xl">
         {error && <div className="text-red-600 mb-4">{error}</div>}
         {result && recommendations && (
