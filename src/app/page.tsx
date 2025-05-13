@@ -209,7 +209,12 @@ export default function Home() {
           <div className="mb-8">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Favori Konumlar</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-gray-900">Favori Konumlar</h2>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {favorites.length}
+                  </span>
+                </div>
                 <button
                   onClick={() => {
                     if (window.confirm('Tüm favori konumları silmek istediğinizden emin misiniz?')) {
@@ -230,9 +235,9 @@ export default function Home() {
                   <button
                     key={index}
                     onClick={() => fetchAirQuality(`${fav.latitude},${fav.longitude}`)}
-                    className="bg-gradient-to-r from-green-50 to-blue-50 hover:from-green-100 hover:to-blue-100 text-gray-900 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-200 transition-all duration-300 hover:shadow-md"
+                    className="group bg-gradient-to-r from-green-50 to-blue-50 hover:from-green-100 hover:to-blue-100 text-gray-900 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-200 transition-all duration-300 hover:shadow-md"
                   >
-                    <span>📍</span>
+                    <span className="group-hover:scale-110 transition-transform">📍</span>
                     {fav.name}
                   </button>
                 ))}
@@ -244,43 +249,86 @@ export default function Home() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl mx-auto mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
             <div className="flex gap-3">
-              <input
-                id="location"
-                type="text"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-                placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm"
-                required
-              />
+              <div className="relative flex-1">
+                <input
+                  id="location"
+                  type="text"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm"
+                  required
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+              </div>
               <button
                 type="button"
                 onClick={getCurrentLocation}
                 disabled={isLocating}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                {isLocating ? "Konum Alınıyor..." : "📍"}
+                {isLocating ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Konum Alınıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📍</span>
+                    <span>Konumumu Bul</span>
+                  </>
+                )}
               </button>
             </div>
             <div className="flex gap-3 mt-3">
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                 disabled={loading}
               >
-                {loading ? "Sorgulanıyor..." : "Hava Kalitesini Göster"}
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Sorgulanıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+                    </svg>
+                    <span>Hava Kalitesini Göster</span>
+                  </>
+                )}
               </button>
               {currentCoords && (
                 <button
                   type="button"
                   onClick={toggleFavorite}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl ${
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 ${
                     isFavorite 
                       ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white hover:from-yellow-500 hover:to-yellow-600' 
                       : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300 border border-gray-200'
                   }`}
                 >
-                  {isFavorite ? '★' : '☆'}
+                  {isFavorite ? (
+                    <>
+                      <span className="text-xl">★</span>
+                      <span>Favorilerden Çıkar</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xl">☆</span>
+                      <span>Favorilere Ekle</span>
+                    </>
+                  )}
                 </button>
               )}
             </div>
@@ -289,7 +337,10 @@ export default function Home() {
 
         <div className="space-y-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl shadow-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl shadow-lg flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
               {error}
             </div>
           )}
@@ -303,7 +354,7 @@ export default function Home() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
                 <h2 className="text-2xl font-semibold mb-6 text-gray-900">Öneriler</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)}`}>
+                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-semibold text-lg">Dış Aktivite Durumu</h3>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -313,7 +364,7 @@ export default function Home() {
                     <p className="text-base">{recommendations.outdoorActivity}</p>
                   </div>
 
-                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)}`}>
+                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-semibold text-lg">Sağlık Önerileri</h3>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -323,7 +374,7 @@ export default function Home() {
                     <p className="text-base">{recommendations.healthAdvice}</p>
                   </div>
 
-                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)}`}>
+                  <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-semibold text-lg">Maske Kullanımı</h3>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -333,7 +384,7 @@ export default function Home() {
                     <p className="text-base">{recommendations.maskAdvice}</p>
                   </div>
 
-                  <div className="p-6 rounded-xl bg-blue-50 border border-blue-200">
+                  <div className="p-6 rounded-xl bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-semibold text-lg text-blue-900">Genel Bilgilendirme</h3>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">

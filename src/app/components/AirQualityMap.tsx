@@ -34,57 +34,95 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
 
   // Popup içeriğini memoize et
   const popupContent = useMemo(() => (
-    <div className="p-2">
-      <h3 className="font-semibold mb-2">{location}</h3>
+    <div className="p-4 min-w-[200px]">
+      <h3 className="font-semibold text-lg mb-3 text-gray-900">{location}</h3>
       {data.aqi && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 mb-3">
           <div
-            className="w-4 h-4 rounded-full"
+            className="w-5 h-5 rounded-full shadow-sm"
             style={{ backgroundColor: getAQIColor(data.aqi).bg }}
           />
-          <span>AQI: {data.aqi}</span>
+          <div>
+            <div className="font-medium text-gray-900">AQI: {data.aqi}</div>
+            <div className="text-sm text-gray-600">
+              {data.aqi <= 50 ? 'İyi' : 
+               data.aqi <= 100 ? 'Orta' : 
+               data.aqi <= 150 ? 'Hassas' : 
+               data.aqi <= 200 ? 'Sağlıksız' : 
+               data.aqi <= 300 ? 'Çok Sağlıksız' : 'Tehlikeli'}
+            </div>
+          </div>
         </div>
       )}
-      {data.pm2_5 && <div>PM2.5: {data.pm2_5} µg/m³</div>}
-      {data.pm10 && <div>PM10: {data.pm10} µg/m³</div>}
+      <div className="space-y-2">
+        {data.pm2_5 && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">PM2.5</span>
+            <span className="font-medium text-gray-900">{data.pm2_5} µg/m³</span>
+          </div>
+        )}
+        {data.pm10 && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">PM10</span>
+            <span className="font-medium text-gray-900">{data.pm10} µg/m³</span>
+          </div>
+        )}
+      </div>
+      <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
+        Son güncelleme: {new Date().toLocaleTimeString('tr-TR')}
+      </div>
     </div>
   ), [location, data.aqi, data.pm2_5, data.pm10]);
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-900">Hava Kalitesi Haritası</h2>
-      <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900">Hava Kalitesi Haritası</h2>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+          <span>Haritayı yakınlaştırmak için fare tekerleğini kullanın</span>
+        </div>
+      </div>
+      <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200 shadow-lg">
         <MapContainer
           center={center}
           zoom={13}
           style={{ height: '100%', width: '100%' }}
+          zoomControl={false}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={center} icon={icon}>
-            <Popup>
+            <Popup
+              className="custom-popup"
+              closeButton={true}
+              closeOnClick={false}
+              autoPan={true}
+            >
               {popupContent}
             </Popup>
           </Marker>
         </MapContainer>
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-          <div className="w-4 h-4 rounded-full bg-[#00e400]" />
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-4 h-4 rounded-full bg-[#00e400] shadow-sm" />
           <span className="text-sm font-medium text-gray-800">İyi (0-50)</span>
         </div>
-        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-          <div className="w-4 h-4 rounded-full bg-[#ffd700]" />
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-4 h-4 rounded-full bg-[#ffd700] shadow-sm" />
           <span className="text-sm font-medium text-gray-800">Orta (51-100)</span>
         </div>
-        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-          <div className="w-4 h-4 rounded-full bg-[#ff7e00]" />
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-4 h-4 rounded-full bg-[#ff7e00] shadow-sm" />
           <span className="text-sm font-medium text-gray-800">Hassas (101-150)</span>
         </div>
-        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-          <div className="w-4 h-4 rounded-full bg-[#ff0000]" />
+        <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-4 h-4 rounded-full bg-[#ff0000] shadow-sm" />
           <span className="text-sm font-medium text-gray-800">Sağlıksız (151-200)</span>
         </div>
       </div>
