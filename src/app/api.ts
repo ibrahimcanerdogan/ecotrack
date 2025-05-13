@@ -231,4 +231,9 @@ export async function getAirQualityForecast(lat: number, lon: number): Promise<A
     console.error("Hava kalitesi tahmini alınamadı:", error);
     return null;
   }
+}
+
+// Tüm favori konumları sil
+export function clearAllFavoriteLocations(): void {
+  localStorage.removeItem('favoriteLocations');
 } 

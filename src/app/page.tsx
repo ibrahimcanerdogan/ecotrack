@@ -14,7 +14,8 @@ import {
   removeFavoriteLocation,
   isFavoriteLocation,
   getAirQualityForecast,
-  AirQualityForecast
+  AirQualityForecast,
+  clearAllFavoriteLocations
 } from "./api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -154,7 +155,23 @@ export default function Home() {
       {favorites.length > 0 && (
         <div className="w-full max-w-4xl mb-6">
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-lg font-semibold mb-3 text-gray-900">Favori Konumlar</h2>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold text-gray-900">Favori Konumlar</h2>
+              <button
+                onClick={() => {
+                  if (window.confirm('Tüm favori konumları silmek istediğinizden emin misiniz?')) {
+                    clearAllFavoriteLocations();
+                    setFavorites([]);
+                  }
+                }}
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Tümünü Sil
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {favorites.map((fav, index) => (
                 <button
