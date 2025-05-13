@@ -281,38 +281,10 @@ export default function Home() {
         {error && <div className="text-red-700 bg-red-50 p-4 rounded-lg border border-red-200 mb-4">{error}</div>}
         {result && recommendations && (
           <div className="space-y-6">
-            {/* Hava Kalitesi Haritası */}
-            {currentCoords && (
-              <AirQualityMap
-                center={[currentCoords.latitude, currentCoords.longitude]}
-                data={result}
-                location={displayLocation}
-              />
-            )}
-
             {/* Hava Kalitesi İstatistikleri */}
             <AirQualityStats data={result} />
 
-            {historicalData && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-900">Son 24 Saat Hava Kalitesi Değişimi</h2>
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={historicalData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="time" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" />
-                      <Line type="monotone" dataKey="pm2_5" stroke="#82ca9d" name="PM2.5" />
-                      <Line type="monotone" dataKey="pm10" stroke="#ffc658" name="PM10" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-
+            {/* Öneriler */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-900">Öneriler</h2>
               <div className="space-y-4">
@@ -377,6 +349,28 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Son 24 Saat Hava Kalitesi Değişimi */}
+            {historicalData && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4 text-gray-900">Son 24 Saat Hava Kalitesi Değişimi</h2>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" />
+                      <Line type="monotone" dataKey="pm2_5" stroke="#82ca9d" name="PM2.5" />
+                      <Line type="monotone" dataKey="pm10" stroke="#ffc658" name="PM10" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {/* Gelecek 24 Saat Tahmini */}
             {forecast && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4 text-gray-900">Gelecek 24 Saat Tahmini</h2>
@@ -407,6 +401,15 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Hava Kalitesi Haritası */}
+            {currentCoords && (
+              <AirQualityMap
+                center={[currentCoords.latitude, currentCoords.longitude]}
+                data={result}
+                location={displayLocation}
+              />
             )}
           </div>
         )}
