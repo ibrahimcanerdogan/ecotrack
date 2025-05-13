@@ -110,6 +110,7 @@ export default function Home() {
         setIsLocating(false);
       },
       (error: GeolocationPositionError) => {
+        console.error("Geolocation error:", error);
         setError("Konum alınamadı. Lütfen konum izni verin veya manuel giriş yapın.");
         setIsLocating(false);
       }
