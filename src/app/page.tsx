@@ -287,8 +287,8 @@ export default function Home() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl mx-auto mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
-            <div className="flex gap-3">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-6 border border-gray-100">
+            <div className="flex flex-col md:flex-row gap-3">
               <div className="relative flex-1" ref={searchRef}>
                 <input
                   id="location"
@@ -300,8 +300,8 @@ export default function Home() {
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
-                  placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm"
+                  placeholder="Şehir, Ülke veya Koordinat"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-900 bg-white/50 backdrop-blur-sm text-base md:text-sm"
                   required
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" viewBox="0 0 20 20" fill="currentColor">
@@ -322,7 +322,7 @@ export default function Home() {
                       setIsFavorite(false);
                       setDisplayLocation("");
                     }}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -330,7 +330,7 @@ export default function Home() {
                   </button>
                 )}
                 {showSuggestions && suggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-[60vh] md:max-h-60 overflow-y-auto">
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
@@ -340,7 +340,7 @@ export default function Home() {
                           setShowSuggestions(false);
                           fetchAirQuality(suggestion.name);
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none text-gray-900 flex items-center gap-2"
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none text-gray-900 flex items-center gap-2 border-b border-gray-100 last:border-b-0"
                       >
                         <span className="text-gray-400">📍</span>
                         {suggestion.name}
@@ -353,7 +353,7 @@ export default function Home() {
                 type="button"
                 onClick={getCurrentLocation}
                 disabled={isLocating}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl flex items-center gap-2 w-[220px] justify-center"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl px-6 py-3.5 font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl flex items-center gap-2 w-full md:w-[220px] justify-center text-base md:text-sm"
               >
                 {isLocating ? (
                   <>
@@ -371,10 +371,10 @@ export default function Home() {
                 )}
               </button>
             </div>
-            <div className="flex gap-3 mt-3">
+            <div className="flex flex-col md:flex-row gap-3 mt-3">
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl px-6 py-3 font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl px-6 py-3.5 font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-base md:text-sm"
                 disabled={loading}
               >
                 {loading ? (
@@ -398,7 +398,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={toggleFavorite}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 w-[220px] justify-center ${
+                  className={`px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 w-full md:w-[220px] justify-center text-base md:text-sm ${
                     isFavorite 
                       ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white hover:from-yellow-500 hover:to-yellow-600' 
                       : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300 border border-gray-200'
