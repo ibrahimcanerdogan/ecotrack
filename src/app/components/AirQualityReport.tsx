@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { AirQualityData, AirQualityRecommendation, HistoricalAirQualityData, AirQualityForecast } from '../api';
 
 // Türkçe karakterleri destekleyen font tanımlaması
@@ -145,7 +145,7 @@ const AirQualityReport = ({ location, data, recommendations, historicalData, for
       </View>
 
       <Text style={styles.footer}>
-        Bu rapor EcoTrack tarafından oluşturulmuştur. Veriler Open-Meteo API'sinden alınmıştır.
+        Bu rapor EcoTrack tarafından oluşturulmuştur. Veriler Open-Meteo API&apos;sinden alınmıştır.
       </Text>
     </Page>
   </Document>

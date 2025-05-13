@@ -76,7 +76,7 @@ export default function Home() {
       const data = await res.json();
       if (data.results) {
         // Benzersiz şehir isimlerini filtrele
-        const uniqueSuggestions = data.results.reduce((acc: any[], current: any) => {
+        const uniqueSuggestions = data.results.reduce((acc: Array<{ name: string }>, current: { name: string }) => {
           const isDuplicate = acc.some(item => item.name === current.name);
           if (!isDuplicate) {
             acc.push(current);
@@ -109,7 +109,7 @@ export default function Home() {
         await fetchAirQuality(`${latitude},${longitude}`);
         setIsLocating(false);
       },
-      (error) => {
+      (error: GeolocationPositionError) => {
         setError("Konum alınamadı. Lütfen konum izni verin veya manuel giriş yapın.");
         setIsLocating(false);
       }
@@ -153,7 +153,7 @@ export default function Home() {
       setRecommendations(getAirQualityRecommendations(airQuality));
       setHistoricalData(historical);
       setForecast(forecastData);
-    } catch (err) {
+    } catch {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
       setLoading(false);
@@ -215,7 +215,7 @@ export default function Home() {
               fileName={`hava-kalitesi-raporu-${new Date().toISOString().split('T')[0]}.pdf`}
               className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-full hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              {({ blob, url, loading, error }) => 
+              {({ loading, error }) => 
                 loading ? (
                   <div className="flex items-center gap-2">
                     <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
