@@ -32,6 +32,7 @@ export type FavoriteLocation = {
   latitude: number;
   longitude: number;
   lastUpdated?: string;
+  displayName?: string;
 };
 
 export type AirQualityForecast = {
@@ -46,15 +47,37 @@ export type AirQualityForecast = {
 }[];
 
 // Basit bir geocoding için Open-Meteo'nun ücretsiz endpointi kullanılabilir
-export async function getCoordinates(location: string): Promise<{ latitude: number; longitude: number } | null> {
+export async function getCoordinates(location: string): Promise<{ latitude: number; longitude: number; displayName?: string } | null> {
   // Eğer doğrudan koordinat girildiyse (örn: 41.0082,28.9784)
   const coordMatch = location.match(/^\s*(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)\s*$/);
   if (coordMatch) {
+    const lat = parseFloat(coordMatch[1]);
+    const lon = parseFloat(coordMatch[2]);
+    
+    // Koordinatlar için ters geocoding yap
+    try {
+      const res = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1&language=tr&format=json`
+      );
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        return {
+          latitude: lat,
+          longitude: lon,
+          displayName: data.results[0].name
+        };
+      }
+    } catch (error) {
+      console.error("Ters geocoding hatası:", error);
+    }
+    
     return {
-      latitude: parseFloat(coordMatch[1]),
-      longitude: parseFloat(coordMatch[2]),
+      latitude: lat,
+      longitude: lon,
+      displayName: `${lat.toFixed(2)}, ${lon.toFixed(2)}`
     };
   }
+  
   // Şehir/ülke için Open-Meteo geocoding API
   const res = await fetch(
     `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=tr&format=json`
@@ -64,6 +87,7 @@ export async function getCoordinates(location: string): Promise<{ latitude: numb
     return {
       latitude: data.results[0].latitude,
       longitude: data.results[0].longitude,
+      displayName: data.results[0].name
     };
   }
   return null;
@@ -186,7 +210,11 @@ export function addFavoriteLocation(location: FavoriteLocation): void {
   }
 
   // Yeni konumu ekle
-  favorites.push({ ...location, lastUpdated: new Date().toISOString() });
+  favorites.push({ 
+    ...location, 
+    lastUpdated: new Date().toISOString(),
+    displayName: location.displayName || location.name
+  });
   localStorage.setItem('favoriteLocations', JSON.stringify(favorites));
 }
 

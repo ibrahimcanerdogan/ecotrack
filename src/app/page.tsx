@@ -89,7 +89,7 @@ export default function Home() {
         return;
       }
       setCurrentCoords(coords);
-      setDisplayLocation(loc);
+      setDisplayLocation(coords.displayName || loc);
       
       // Favori kontrolü
       const isFav = isFavoriteLocation(coords.latitude, coords.longitude);
@@ -130,13 +130,11 @@ export default function Home() {
       removeFavoriteLocation(currentCoords.latitude, currentCoords.longitude);
       setIsFavorite(false);
     } else {
-      // Koordinatları kısa formatta göster (2 ondalık basamak)
-      const shortLat = currentCoords.latitude.toFixed(2);
-      const shortLon = currentCoords.longitude.toFixed(2);
       addFavoriteLocation({
-        name: `${shortLat}, ${shortLon}`,
+        name: displayLocation,
         latitude: currentCoords.latitude,
-        longitude: currentCoords.longitude
+        longitude: currentCoords.longitude,
+        displayName: displayLocation
       });
       setIsFavorite(true);
     }
@@ -238,7 +236,7 @@ export default function Home() {
                     className="group bg-gradient-to-r from-green-50 to-blue-50 hover:from-green-100 hover:to-blue-100 text-gray-900 px-4 py-2 rounded-full text-sm flex items-center gap-2 border border-gray-200 transition-all duration-300 hover:shadow-md"
                   >
                     <span className="group-hover:scale-110 transition-transform">📍</span>
-                    {fav.name}
+                    {fav.displayName || fav.name}
                   </button>
                 ))}
               </div>
