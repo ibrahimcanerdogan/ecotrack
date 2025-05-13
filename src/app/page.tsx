@@ -99,7 +99,7 @@ export default function Home() {
     setIsLocating(true);
     setError("");
 
-    if (!navigator.geolocation) {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       setError("Tarayıcınız konum özelliğini desteklemiyor.");
       setIsLocating(false);
       return;
@@ -262,7 +262,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => {
-                    if (window.confirm('Tüm favori konumları silmek istediğinizden emin misiniz?')) {
+                    if (typeof window !== 'undefined' && window.confirm('Tüm favori konumları silmek istediğinizden emin misiniz?')) {
                       clearAllFavoriteLocations();
                       setFavorites([]);
                     }
