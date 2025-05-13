@@ -17,6 +17,8 @@ import {
   AirQualityForecast
 } from "./api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import AirQualityReport from './components/AirQualityReport';
 
 export default function Home() {
   const [location, setLocation] = useState("");
@@ -216,7 +218,16 @@ export default function Home() {
         {result && recommendations && (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Hava Kalitesi Verileri</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Hava Kalitesi Verileri</h2>
+                <PDFDownloadLink
+                  document={<AirQualityReport location={location} data={result} recommendations={recommendations} />}
+                  fileName={`hava-kalitesi-raporu-${new Date().toISOString().split('T')[0]}.pdf`}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  {({ loading }) => loading ? 'Rapor Hazırlanıyor...' : 'PDF İndir'}
+                </PDFDownloadLink>
+              </div>
               <div className="flex flex-col gap-2 text-gray-700">
                 {result.aqi !== undefined && <div><b>AQI:</b> {result.aqi}</div>}
                 {result.pm2_5 !== undefined && <div><b>PM2.5:</b> {result.pm2_5} µg/m³</div>}
