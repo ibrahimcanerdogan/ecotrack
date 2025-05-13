@@ -438,63 +438,235 @@ export default function Home() {
 
               {/* Öneriler */}
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-900">Öneriler</h2>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-semibold text-gray-900">Öneriler</h2>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>Hava kalitesi durumuna göre özelleştirilmiş öneriler</span>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-semibold text-lg">Dış Aktivite Durumu</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-white/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">Dış Aktivite Durumu</h3>
+                        <p className="text-sm text-gray-600">Şu anki hava kalitesi için öneriler</p>
+                      </div>
                     </div>
-                    <p className="text-base">{recommendations.outdoorActivity}</p>
+                    <div className="space-y-3">
+                      <p className="text-base">{recommendations.outdoorActivity}</p>
+                      <div className="pt-3 border-t border-gray-200">
+                        <h4 className="font-medium mb-2">Önerilen Aktiviteler:</h4>
+                        <ul className="space-y-2">
+                          {recommendations.overallStatus === 'good' && (
+                            <>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Açık havada spor yapabilirsiniz</span>
+                              </li>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Piknik ve açık hava etkinlikleri uygundur</span>
+                              </li>
+                            </>
+                          )}
+                          {recommendations.overallStatus === 'moderate' && (
+                            <>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Hafif aktiviteler yapabilirsiniz</span>
+                              </li>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Yoğun egzersizlerden kaçının</span>
+                              </li>
+                            </>
+                          )}
+                          {recommendations.overallStatus === 'poor' && (
+                            <>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Dışarıda minimum süre geçirin</span>
+                              </li>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Fiziksel aktiviteleri kapalı alanlarda yapın</span>
+                              </li>
+                            </>
+                          )}
+                          {recommendations.overallStatus === 'very_poor' && (
+                            <>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Mümkünse dışarı çıkmayın</span>
+                              </li>
+                              <li className="flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>Tüm aktiviteleri kapalı alanlarda yapın</span>
+                              </li>
+                            </>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
 
                   <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-semibold text-lg">Sağlık Önerileri</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-white/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">Sağlık Önerileri</h3>
+                        <p className="text-sm text-gray-600">Sağlığınız için önemli tavsiyeler</p>
+                      </div>
                     </div>
-                    <p className="text-base">{recommendations.healthAdvice}</p>
+                    <div className="space-y-3">
+                      <p className="text-base">{recommendations.healthAdvice}</p>
+                      <div className="pt-3 border-t border-gray-200">
+                        <h4 className="font-medium mb-2">Hassas Gruplar İçin:</h4>
+                        <ul className="space-y-2">
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Astım, KOAH ve diğer solunum yolu hastalığı olanlar dikkatli olmalı</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Yaşlılar ve çocuklar için özel önlemler alınmalı</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Kalp ve damar hastalığı olanlar dışarıda minimum süre geçirmeli</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
 
                   <div className={`p-6 rounded-xl ${getStatusColor(recommendations.overallStatus)} hover:shadow-md transition-shadow`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-semibold text-lg">Maske Kullanımı</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-white/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">Maske Kullanımı</h3>
+                        <p className="text-sm text-gray-600">Koruyucu önlemler</p>
+                      </div>
                     </div>
-                    <p className="text-base">{recommendations.maskAdvice}</p>
+                    <div className="space-y-3">
+                      <p className="text-base">{recommendations.maskAdvice}</p>
+                      <div className="pt-3 border-t border-gray-200">
+                        <h4 className="font-medium mb-2">Maske Kullanım Önerileri:</h4>
+                        <ul className="space-y-2">
+                          {recommendations.overallStatus === 'good' && (
+                            <li className="flex items-center gap-2 text-sm">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Maske kullanımı gerekli değil</span>
+                            </li>
+                          )}
+                          {recommendations.overallStatus === 'moderate' && (
+                            <li className="flex items-center gap-2 text-sm">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Hassas gruplar için maske önerilir</span>
+                            </li>
+                          )}
+                          {recommendations.overallStatus === 'poor' && (
+                            <li className="flex items-center gap-2 text-sm">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Dışarıda maske kullanımı önerilir</span>
+                            </li>
+                          )}
+                          {recommendations.overallStatus === 'very_poor' && (
+                            <li className="flex items-center gap-2 text-sm">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Dışarıda mutlaka maske kullanılmalı</span>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="p-6 rounded-xl bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-semibold text-lg text-blue-900">Genel Bilgilendirme</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-white/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-blue-900">Genel Bilgilendirme</h3>
+                        <p className="text-sm text-blue-700">Önemli notlar ve bilgiler</p>
+                      </div>
                     </div>
-                    <ul className="text-base text-blue-800 space-y-3">
+                    <ul className="space-y-3">
                       <li className="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>Hava kalitesi verileri saatlik olarak güncellenmektedir.</span>
+                        <div>
+                          <span className="text-blue-900 font-medium">Veri Güncellemesi</span>
+                          <p className="text-sm text-blue-700">Hava kalitesi verileri saatlik olarak güncellenmektedir.</p>
+                        </div>
                       </li>
                       <li className="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>Öneriler, mevcut hava kalitesi durumuna göre kişiselleştirilmiştir.</span>
+                        <div>
+                          <span className="text-blue-900 font-medium">Kişiselleştirilmiş Öneriler</span>
+                          <p className="text-sm text-blue-700">Öneriler, mevcut hava kalitesi durumuna göre kişiselleştirilmiştir.</p>
+                        </div>
                       </li>
                       <li className="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>Hassas gruplar (astım, kalp hastalığı vb.) için özel önlemler alınmalıdır.</span>
+                        <div>
+                          <span className="text-blue-900 font-medium">Hassas Gruplar</span>
+                          <p className="text-sm text-blue-700">Astım, kalp hastalığı vb. kronik rahatsızlığı olanlar için özel önlemler alınmalıdır.</p>
+                        </div>
                       </li>
                     </ul>
                   </div>
