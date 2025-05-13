@@ -556,17 +556,19 @@ export default function Home() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {forecast.slice(0, 4).map((hour, index) => (
-                      <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="font-semibold text-gray-900 mb-2">{hour.time}</div>
-                        <div className="text-sm text-gray-800 space-y-1">
-                          <div>AQI: {hour.aqi}</div>
-                          <div>PM2.5: {hour.pm2_5} µg/m³</div>
-                          <div>PM10: {hour.pm10} µg/m³</div>
+                  <div className="mt-6 relative overflow-hidden">
+                    <div className="flex space-x-4 animate-scroll">
+                      {forecast.map((hour, index) => (
+                        <div key={index} className="flex-none w-[200px] bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="font-semibold text-gray-900 mb-2">{hour.time}</div>
+                          <div className="text-sm text-gray-800 space-y-1">
+                            <div>AQI: {hour.aqi}</div>
+                            <div>PM2.5: {hour.pm2_5} µg/m³</div>
+                            <div>PM10: {hour.pm10} µg/m³</div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
