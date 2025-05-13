@@ -155,24 +155,43 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-green-900">EcoTrack 🌱</h1>
         {result && recommendations && (
           <PDFDownloadLink
-            document={<AirQualityReport 
-              location={location} 
-              data={result} 
-              recommendations={recommendations}
-              historicalData={historicalData}
-              forecast={forecast}
-            />}
+            document={
+              <AirQualityReport 
+                location={displayLocation} 
+                data={result} 
+                recommendations={recommendations}
+                historicalData={historicalData}
+                forecast={forecast}
+              />
+            }
             fileName={`hava-kalitesi-raporu-${new Date().toISOString().split('T')[0]}.pdf`}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center gap-2"
           >
-            {({ loading }) => (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                </svg>
-                {loading ? 'Rapor Hazırlanıyor...' : 'Tüm Verileri PDF İndir'}
-              </>
-            )}
+            {({ blob, url, loading, error }) => 
+              loading ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Rapor Hazırlanıyor...
+                </div>
+              ) : error ? (
+                <div className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Rapor Oluşturulamadı
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                  </svg>
+                  Tüm Verileri PDF İndir
+                </div>
+              )
+            }
           </PDFDownloadLink>
         )}
       </div>
@@ -298,16 +317,62 @@ export default function Home() {
               <h2 className="text-xl font-semibold mb-4 text-gray-900">Öneriler</h2>
               <div className="space-y-4">
                 <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
-                  <h3 className="font-semibold mb-2">Dış Aktivite Durumu</h3>
-                  <p>{recommendations.outdoorActivity}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Dış Aktivite Durumu</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-sm">{recommendations.outdoorActivity}</p>
                 </div>
+
                 <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
-                  <h3 className="font-semibold mb-2">Sağlık Önerileri</h3>
-                  <p>{recommendations.healthAdvice}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Sağlık Önerileri</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-sm">{recommendations.healthAdvice}</p>
                 </div>
+
                 <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
-                  <h3 className="font-semibold mb-2">Maske Kullanımı</h3>
-                  <p>{recommendations.maskAdvice}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Maske Kullanımı</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-sm">{recommendations.maskAdvice}</p>
+                </div>
+
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-blue-900">Genel Bilgilendirme</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Hava kalitesi verileri saatlik olarak güncellenmektedir.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Öneriler, mevcut hava kalitesi durumuna göre kişiselleştirilmiştir.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Hassas gruplar (astım, kalp hastalığı vb.) için özel önlemler alınmalıdır.</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
