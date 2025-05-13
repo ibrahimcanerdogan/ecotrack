@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getCoordinates, getAirQuality, AirQualityData, getAirQualityRecommendations, AirQualityRecommendation } from "./api";
+import { getCoordinates, getAirQuality, AirQualityData, getAirQualityRecommendations, AirQualityRecommendation, getHistoricalAirQuality, HistoricalAirQualityData } from "./api";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
   const [location, setLocation] = useState("");
   const [result, setResult] = useState<AirQualityData | null>(null);
   const [recommendations, setRecommendations] = useState<AirQualityRecommendation | null>(null);
+  const [historicalData, setHistoricalData] = useState<HistoricalAirQualityData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isLocating, setIsLocating] = useState(false);
@@ -40,6 +42,7 @@ export default function Home() {
     setError("");
     setResult(null);
     setRecommendations(null);
+    setHistoricalData(null);
     setLoading(true);
     try {
       const coords = await getCoordinates(loc);
@@ -48,14 +51,20 @@ export default function Home() {
         setLoading(false);
         return;
       }
-      const airQuality = await getAirQuality(coords.latitude, coords.longitude);
+      const [airQuality, historical] = await Promise.all([
+        getAirQuality(coords.latitude, coords.longitude),
+        getHistoricalAirQuality(coords.latitude, coords.longitude)
+      ]);
+      
       if (!airQuality) {
         setError("Hava kalitesi verisi alınamadı.");
         setLoading(false);
         return;
       }
+      
       setResult(airQuality);
       setRecommendations(getAirQualityRecommendations(airQuality));
+      setHistoricalData(historical);
     } catch (err) {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
@@ -109,7 +118,7 @@ export default function Home() {
           {loading ? "Sorgulanıyor..." : "Hava Kalitesini Göster"}
         </button>
       </form>
-      <div className="mt-8 w-full max-w-md">
+      <div className="mt-8 w-full max-w-4xl">
         {error && <div className="text-red-600 mb-4">{error}</div>}
         {result && recommendations && (
           <div className="space-y-6">
@@ -126,6 +135,26 @@ export default function Home() {
                 {result.time && <div className="text-xs text-gray-400 mt-2">Veri zamanı: {result.time}</div>}
               </div>
             </div>
+
+            {historicalData && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Son 24 Saat Hava Kalitesi Değişimi</h2>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" />
+                      <Line type="monotone" dataKey="pm2_5" stroke="#82ca9d" name="PM2.5" />
+                      <Line type="monotone" dataKey="pm10" stroke="#ffc658" name="PM10" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Öneriler</h2>
