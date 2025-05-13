@@ -40,18 +40,6 @@ export default function Home() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Favori konumları yükle
-  useEffect(() => {
-    setFavorites(getFavoriteLocations());
-  }, []);
-
-  // Mevcut konum favori mi kontrol et
-  useEffect(() => {
-    if (currentCoords) {
-      setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
-    }
-  }, [currentCoords]);
-
   // Dışarı tıklandığında önerileri kapat
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,9 +47,25 @@ export default function Home() {
         setShowSuggestions(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (typeof window !== 'undefined') {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
   }, []);
+
+  // Favori konumları yükle
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setFavorites(getFavoriteLocations());
+    }
+  }, []);
+
+  // Mevcut konum favori mi kontrol et
+  useEffect(() => {
+    if (typeof window !== 'undefined' && currentCoords) {
+      setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
+    }
+  }, [currentCoords]);
 
   // Konum önerilerini al
   const fetchSuggestions = async (query: string) => {
