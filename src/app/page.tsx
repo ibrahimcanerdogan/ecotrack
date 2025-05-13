@@ -504,13 +504,35 @@ export default function Home() {
               {/* Son 24 Saat Hava Kalitesi Değişimi */}
               {historicalData && (
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100">
-                  <h2 className="text-2xl font-semibold mb-6 text-gray-900">Son 24 Saat Hava Kalitesi Değişimi</h2>
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900">Son 24 Saat Hava Kalitesi Değişimi</h2>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <span>Grafiğin üzerine gelerek detaylı bilgi alabilirsiniz</span>
+                    </div>
+                  </div>
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={historicalData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis dataKey="time" stroke="#6b7280" />
-                        <YAxis stroke="#6b7280" />
+                        <XAxis 
+                          dataKey="time" 
+                          stroke="#6b7280"
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => value.split(':')[0] + ':00'}
+                        />
+                        <YAxis 
+                          stroke="#6b7280"
+                          tick={{ fontSize: 12 }}
+                          label={{ 
+                            value: 'Değer', 
+                            angle: -90, 
+                            position: 'insideLeft',
+                            style: { textAnchor: 'middle', fontSize: 12 }
+                          }}
+                        />
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -519,13 +541,96 @@ export default function Home() {
                             borderRadius: '0.75rem',
                             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                           }}
+                          formatter={(value: number, name: string) => {
+                            const unit = name === 'AQI' ? '' : ' µg/m³';
+                            return [value.toFixed(1) + unit, name];
+                          }}
+                          labelFormatter={(label) => `Saat: ${label}`}
                         />
-                        <Legend />
-                        <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" strokeWidth={2} />
-                        <Line type="monotone" dataKey="pm2_5" stroke="#82ca9d" name="PM2.5" strokeWidth={2} />
-                        <Line type="monotone" dataKey="pm10" stroke="#ffc658" name="PM10" strokeWidth={2} />
+                        <Legend 
+                          verticalAlign="top" 
+                          height={36}
+                          wrapperStyle={{
+                            paddingBottom: '20px'
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="aqi" 
+                          stroke="#8884d8" 
+                          name="AQI" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="pm2_5" 
+                          stroke="#82ca9d" 
+                          name="PM2.5" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="pm10" 
+                          stroke="#ffc658" 
+                          name="PM10" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {['aqi', 'pm2_5', 'pm10'].map((metric) => {
+                      const data = historicalData
+                        .map(d => d[metric as keyof typeof d] as number)
+                        .filter((value): value is number => value !== null && value !== undefined);
+                      
+                      if (data.length === 0) return null;
+
+                      const max = Math.max(...data);
+                      const min = Math.min(...data);
+                      const avg = data.reduce((a, b) => a + b, 0) / data.length;
+                      const current = data[data.length - 1];
+                      const firstValue = data[0];
+                      const change = firstValue !== 0 ? ((current - firstValue) / firstValue * 100).toFixed(1) : '0.0';
+                      const isPositive = Number(change) > 0;
+
+                      return (
+                        <div key={metric} className="bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-gray-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-gray-800">
+                              {metric === 'aqi' ? 'AQI' : metric === 'pm2_5' ? 'PM2.5' : 'PM10'}
+                            </h3>
+                            <span className={`text-sm font-medium ${isPositive ? 'text-red-700' : 'text-green-700'}`}>
+                              {isPositive ? '↑' : '↓'} {Math.abs(Number(change))}%
+                            </span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Mevcut:</span>
+                              <span className="font-medium text-gray-900">{current.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Ortalama:</span>
+                              <span className="font-medium text-gray-900">{avg.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">En Yüksek:</span>
+                              <span className="font-medium text-gray-900">{max.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">En Düşük:</span>
+                              <span className="font-medium text-gray-900">{min.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
