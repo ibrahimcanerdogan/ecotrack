@@ -12,7 +12,9 @@ import {
   getFavoriteLocations,
   addFavoriteLocation,
   removeFavoriteLocation,
-  isFavoriteLocation
+  isFavoriteLocation,
+  getAirQualityForecast,
+  AirQualityForecast
 } from "./api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -27,6 +29,7 @@ export default function Home() {
   const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);
   const [currentCoords, setCurrentCoords] = useState<{latitude: number; longitude: number} | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [forecast, setForecast] = useState<AirQualityForecast | null>(null);
 
   // Favori konumları yükle
   useEffect(() => {
@@ -70,6 +73,7 @@ export default function Home() {
     setResult(null);
     setRecommendations(null);
     setHistoricalData(null);
+    setForecast(null);
     setLoading(true);
     try {
       const coords = await getCoordinates(loc);
@@ -79,9 +83,11 @@ export default function Home() {
         return;
       }
       setCurrentCoords(coords);
-      const [airQuality, historical] = await Promise.all([
+
+      const [airQuality, historical, forecastData] = await Promise.all([
         getAirQuality(coords.latitude, coords.longitude),
-        getHistoricalAirQuality(coords.latitude, coords.longitude)
+        getHistoricalAirQuality(coords.latitude, coords.longitude),
+        getAirQualityForecast(coords.latitude, coords.longitude)
       ]);
       
       if (!airQuality) {
@@ -93,6 +99,7 @@ export default function Home() {
       setResult(airQuality);
       setRecommendations(getAirQualityRecommendations(airQuality));
       setHistoricalData(historical);
+      setForecast(forecastData);
     } catch (err) {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
@@ -259,6 +266,38 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {forecast && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Gelecek 24 Saat Tahmini</h2>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={forecast}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" />
+                      <Line type="monotone" dataKey="pm2_5" stroke="#82ca9d" name="PM2.5" />
+                      <Line type="monotone" dataKey="pm10" stroke="#ffc658" name="PM10" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {forecast.slice(0, 4).map((hour, index) => (
+                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                      <div className="font-semibold text-gray-700">{hour.time}</div>
+                      <div className="text-sm text-gray-600">
+                        <div>AQI: {hour.aqi}</div>
+                        <div>PM2.5: {hour.pm2_5} µg/m³</div>
+                        <div>PM10: {hour.pm10} µg/m³</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

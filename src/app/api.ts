@@ -34,6 +34,17 @@ export type FavoriteLocation = {
   lastUpdated?: string;
 };
 
+export type AirQualityForecast = {
+  time: string;
+  aqi: number;
+  pm2_5: number;
+  pm10: number;
+  co: number;
+  no2: number;
+  o3: number;
+  so2: number;
+}[];
+
 // Basit bir geocoding için Open-Meteo'nun ücretsiz endpointi kullanılabilir
 export async function getCoordinates(location: string): Promise<{ latitude: number; longitude: number } | null> {
   // Eğer doğrudan koordinat girildiyse (örn: 41.0082,28.9784)
@@ -194,4 +205,30 @@ export function isFavoriteLocation(latitude: number, longitude: number): boolean
   return favorites.some(f => 
     f.latitude === latitude && f.longitude === longitude
   );
+}
+
+// Gelecek 24 saat için hava kalitesi tahminlerini al
+export async function getAirQualityForecast(lat: number, lon: number): Promise<AirQualityForecast | null> {
+  try {
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,ozone,sulphur_dioxide,us_aqi&forecast_days=1`;
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (data.hourly && data.hourly.time && data.hourly.pm2_5) {
+      return data.hourly.time.map((time: string, index: number) => ({
+        time: new Date(time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        pm10: data.hourly.pm10[index],
+        pm2_5: data.hourly.pm2_5[index],
+        co: data.hourly.carbon_monoxide[index],
+        no2: data.hourly.nitrogen_dioxide[index],
+        o3: data.hourly.ozone[index],
+        so2: data.hourly.sulphur_dioxide[index],
+        aqi: data.hourly.us_aqi[index],
+      }));
+    }
+    return null;
+  } catch (error) {
+    console.error("Hava kalitesi tahmini alınamadı:", error);
+    return null;
+  }
 } 
