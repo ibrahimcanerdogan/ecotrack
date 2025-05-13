@@ -25,6 +25,7 @@ import AirQualityMap from './components/AirQualityMap';
 
 export default function Home() {
   const [location, setLocation] = useState("");
+  const [displayLocation, setDisplayLocation] = useState("");
   const [result, setResult] = useState<AirQualityData | null>(null);
   const [recommendations, setRecommendations] = useState<AirQualityRecommendation | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalAirQualityData | null>(null);
@@ -88,6 +89,7 @@ export default function Home() {
         return;
       }
       setCurrentCoords(coords);
+      setDisplayLocation(loc);
 
       const [airQuality, historical, forecastData] = await Promise.all([
         getAirQuality(coords.latitude, coords.longitude),
@@ -241,7 +243,7 @@ export default function Home() {
               <AirQualityMap
                 center={[currentCoords.latitude, currentCoords.longitude]}
                 data={result}
-                location={location}
+                location={displayLocation}
               />
             )}
 

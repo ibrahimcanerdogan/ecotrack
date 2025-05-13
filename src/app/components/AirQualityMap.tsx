@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AirQualityData } from '../api';
 import L from 'leaflet';
+import { useMemo } from 'react';
 
 // Marker ikonunu düzelt
 const icon = L.icon({
@@ -31,6 +32,24 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
     return { bg: '#7e0023', text: '#ffffff' };
   };
 
+  // Popup içeriğini memoize et
+  const popupContent = useMemo(() => (
+    <div className="p-2">
+      <h3 className="font-semibold mb-2">{location}</h3>
+      {data.aqi && (
+        <div className="flex items-center gap-2">
+          <div
+            className="w-4 h-4 rounded-full"
+            style={{ backgroundColor: getAQIColor(data.aqi).bg }}
+          />
+          <span>AQI: {data.aqi}</span>
+        </div>
+      )}
+      {data.pm2_5 && <div>PM2.5: {data.pm2_5} µg/m³</div>}
+      {data.pm10 && <div>PM10: {data.pm10} µg/m³</div>}
+    </div>
+  ), [location, data.aqi, data.pm2_5, data.pm10]);
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold mb-4 text-gray-900">Hava Kalitesi Haritası</h2>
@@ -46,20 +65,7 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
           />
           <Marker position={center} icon={icon}>
             <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold mb-2">{location}</h3>
-                {data.aqi && (
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: getAQIColor(data.aqi).bg }}
-                    />
-                    <span>AQI: {data.aqi}</span>
-                  </div>
-                )}
-                {data.pm2_5 && <div>PM2.5: {data.pm2_5} µg/m³</div>}
-                {data.pm10 && <div>PM10: {data.pm10} µg/m³</div>}
-              </div>
+              {popupContent}
             </Popup>
           </Marker>
         </MapContainer>
