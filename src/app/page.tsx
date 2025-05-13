@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getCoordinates, getAirQuality, AirQualityData, getAirQualityRecommendations, AirQualityRecommendation } from "./api";
 
 export default function Home() {
@@ -8,15 +8,41 @@ export default function Home() {
   const [recommendations, setRecommendations] = useState<AirQualityRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLocating, setIsLocating] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Konum tespiti fonksiyonu
+  const getCurrentLocation = () => {
+    setIsLocating(true);
+    setError("");
+
+    if (!navigator.geolocation) {
+      setError("Tarayıcınız konum özelliğini desteklemiyor.");
+      setIsLocating(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation(`${latitude},${longitude}`);
+        await fetchAirQuality(`${latitude},${longitude}`);
+        setIsLocating(false);
+      },
+      (error) => {
+        setError("Konum alınamadı. Lütfen konum izni verin veya manuel giriş yapın.");
+        setIsLocating(false);
+      }
+    );
+  };
+
+  // Hava kalitesi verilerini çeken fonksiyon
+  const fetchAirQuality = async (loc: string) => {
     setError("");
     setResult(null);
     setRecommendations(null);
     setLoading(true);
     try {
-      const coords = await getCoordinates(location);
+      const coords = await getCoordinates(loc);
       if (!coords) {
         setError("Konum bulunamadı. Lütfen geçerli bir şehir, ülke veya koordinat girin.");
         setLoading(false);
@@ -37,6 +63,11 @@ export default function Home() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchAirQuality(location);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good': return 'bg-green-100 text-green-800';
@@ -51,16 +82,25 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-blue-100 p-4">
       <h1 className="text-3xl font-bold mb-6 text-green-900">EcoTrack 🌱</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md bg-white rounded-lg shadow p-6">
-        <label htmlFor="location" className="font-medium text-gray-700">Şehir, ülke veya koordinat girin:</label>
-        <input
-          id="location"
-          type="text"
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-          placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-          required
-        />
+        <div className="flex gap-2">
+          <input
+            id="location"
+            type="text"
+            value={location}
+            onChange={e => setLocation(e.target.value)}
+            placeholder="Örn: İstanbul, Türkiye veya 41.0082,28.9784"
+            className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+            required
+          />
+          <button
+            type="button"
+            onClick={getCurrentLocation}
+            disabled={isLocating}
+            className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {isLocating ? "Konum Alınıyor..." : "📍"}
+          </button>
+        </div>
         <button
           type="submit"
           className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
