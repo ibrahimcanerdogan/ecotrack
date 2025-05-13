@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
-import { getCoordinates, getAirQuality, AirQualityData } from "./api";
+import { getCoordinates, getAirQuality, AirQualityData, getAirQualityRecommendations, AirQualityRecommendation } from "./api";
 
 export default function Home() {
   const [location, setLocation] = useState("");
   const [result, setResult] = useState<AirQualityData | null>(null);
+  const [recommendations, setRecommendations] = useState<AirQualityRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -12,6 +13,7 @@ export default function Home() {
     e.preventDefault();
     setError("");
     setResult(null);
+    setRecommendations(null);
     setLoading(true);
     try {
       const coords = await getCoordinates(location);
@@ -27,10 +29,21 @@ export default function Home() {
         return;
       }
       setResult(airQuality);
+      setRecommendations(getAirQualityRecommendations(airQuality));
     } catch (err) {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'good': return 'bg-green-100 text-green-800';
+      case 'moderate': return 'bg-yellow-100 text-yellow-800';
+      case 'poor': return 'bg-orange-100 text-orange-800';
+      case 'very_poor': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -58,18 +71,38 @@ export default function Home() {
       </form>
       <div className="mt-8 w-full max-w-md">
         {error && <div className="text-red-600 mb-4">{error}</div>}
-        {result && (
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <h2 className="text-xl font-semibold mb-2">Hava Kalitesi Verileri</h2>
-            <div className="flex flex-col gap-2 text-gray-700">
-              {result.aqi !== undefined && <div><b>AQI:</b> {result.aqi}</div>}
-              {result.pm2_5 !== undefined && <div><b>PM2.5:</b> {result.pm2_5} µg/m³</div>}
-              {result.pm10 !== undefined && <div><b>PM10:</b> {result.pm10} µg/m³</div>}
-              {result.co !== undefined && <div><b>CO:</b> {result.co} µg/m³</div>}
-              {result.no2 !== undefined && <div><b>NO₂:</b> {result.no2} µg/m³</div>}
-              {result.o3 !== undefined && <div><b>O₃:</b> {result.o3} µg/m³</div>}
-              {result.so2 !== undefined && <div><b>SO₂:</b> {result.so2} µg/m³</div>}
-              {result.time && <div className="text-xs text-gray-400 mt-2">Veri zamanı: {result.time}</div>}
+        {result && recommendations && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4">Hava Kalitesi Verileri</h2>
+              <div className="flex flex-col gap-2 text-gray-700">
+                {result.aqi !== undefined && <div><b>AQI:</b> {result.aqi}</div>}
+                {result.pm2_5 !== undefined && <div><b>PM2.5:</b> {result.pm2_5} µg/m³</div>}
+                {result.pm10 !== undefined && <div><b>PM10:</b> {result.pm10} µg/m³</div>}
+                {result.co !== undefined && <div><b>CO:</b> {result.co} µg/m³</div>}
+                {result.no2 !== undefined && <div><b>NO₂:</b> {result.no2} µg/m³</div>}
+                {result.o3 !== undefined && <div><b>O₃:</b> {result.o3} µg/m³</div>}
+                {result.so2 !== undefined && <div><b>SO₂:</b> {result.so2} µg/m³</div>}
+                {result.time && <div className="text-xs text-gray-400 mt-2">Veri zamanı: {result.time}</div>}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4">Öneriler</h2>
+              <div className="space-y-4">
+                <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
+                  <h3 className="font-semibold mb-2">Dış Aktivite Durumu</h3>
+                  <p>{recommendations.outdoorActivity}</p>
+                </div>
+                <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
+                  <h3 className="font-semibold mb-2">Sağlık Önerileri</h3>
+                  <p>{recommendations.healthAdvice}</p>
+                </div>
+                <div className={`p-4 rounded-lg ${getStatusColor(recommendations.overallStatus)}`}>
+                  <h3 className="font-semibold mb-2">Maske Kullanımı</h3>
+                  <p>{recommendations.maskAdvice}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}

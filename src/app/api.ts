@@ -9,6 +9,13 @@ export type AirQualityData = {
   time?: string;
 };
 
+export type AirQualityRecommendation = {
+  outdoorActivity: string;
+  healthAdvice: string;
+  maskAdvice: string;
+  overallStatus: 'good' | 'moderate' | 'poor' | 'very_poor';
+};
+
 // Basit bir geocoding için Open-Meteo'nun ücretsiz endpointi kullanılabilir
 export async function getCoordinates(location: string): Promise<{ latitude: number; longitude: number } | null> {
   // Eğer doğrudan koordinat girildiyse (örn: 41.0082,28.9784)
@@ -55,4 +62,53 @@ export async function getAirQuality(lat: number, lon: number): Promise<AirQualit
     };
   }
   return null;
+}
+
+export function getAirQualityRecommendations(data: AirQualityData): AirQualityRecommendation {
+  const aqi = data.aqi || 0;
+  const pm2_5 = data.pm2_5 || 0;
+  const pm10 = data.pm10 || 0;
+
+  let outdoorActivity = '';
+  let healthAdvice = '';
+  let maskAdvice = '';
+  let overallStatus: 'good' | 'moderate' | 'poor' | 'very_poor' = 'good';
+
+  // AQI değerine göre genel durum
+  if (aqi <= 50) {
+    overallStatus = 'good';
+    outdoorActivity = 'Hava kalitesi iyi. Dışarıda spor yapabilirsiniz.';
+    healthAdvice = 'Hava kalitesi iyi seviyede. Normal aktivitelerinize devam edebilirsiniz.';
+    maskAdvice = 'Maske takmanıza gerek yok.';
+  } else if (aqi <= 100) {
+    overallStatus = 'moderate';
+    outdoorActivity = 'Hava kalitesi orta seviyede. Kısa süreli dış aktiviteler yapabilirsiniz.';
+    healthAdvice = 'Hassas gruplar için orta seviye risk.';
+    maskAdvice = 'Hassas gruplar için maske önerilir.';
+  } else if (aqi <= 150) {
+    overallStatus = 'poor';
+    outdoorActivity = 'Hava kalitesi kötü. Dışarıda spor yapmanız önerilmez.';
+    healthAdvice = 'Hassas gruplar için yüksek risk. Mümkünse dışarı çıkmayın.';
+    maskAdvice = 'Maske takmanız önerilir.';
+  } else {
+    overallStatus = 'very_poor';
+    outdoorActivity = 'Hava kalitesi çok kötü. Kesinlikle dışarıda spor yapmayın.';
+    healthAdvice = 'Tüm gruplar için yüksek risk. Mümkünse dışarı çıkmayın.';
+    maskAdvice = 'Kesinlikle maske takın.';
+  }
+
+  // PM2.5 ve PM10 değerlerine göre ek öneriler
+  if (pm2_5 > 35.4 || pm10 > 54) {
+    healthAdvice += ' Partikül madde seviyesi yüksek.';
+    if (pm2_5 > 35.4) {
+      maskAdvice = 'N95 veya FFP2 maske takmanız önerilir.';
+    }
+  }
+
+  return {
+    outdoorActivity,
+    healthAdvice,
+    maskAdvice,
+    overallStatus
+  };
 } 
