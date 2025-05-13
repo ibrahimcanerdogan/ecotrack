@@ -927,6 +927,10 @@ export default function Home() {
                               <span className="font-medium text-gray-900">{lastValue.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
                             </div>
                             <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Ortalama:</span>
+                              <span className="font-medium text-gray-900">{avg.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
                               <span className="text-gray-700">En Yüksek:</span>
                               <span className="font-medium text-gray-900">{max.toFixed(1)}{metric === 'aqi' ? '' : ' µg/m³'}</span>
                             </div>
