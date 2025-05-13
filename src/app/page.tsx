@@ -20,6 +20,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import AirQualityReport from './components/AirQualityReport';
 import AirQualityStats from './components/AirQualityStats';
+import AirQualityMap from './components/AirQualityMap';
 
 export default function Home() {
   const [location, setLocation] = useState("");
@@ -218,6 +219,15 @@ export default function Home() {
         {error && <div className="text-red-600 mb-4">{error}</div>}
         {result && recommendations && (
           <div className="space-y-6">
+            {/* Hava Kalitesi Haritası */}
+            {currentCoords && (
+              <AirQualityMap
+                center={[currentCoords.latitude, currentCoords.longitude]}
+                data={result}
+                location={location}
+              />
+            )}
+
             {/* Hava Kalitesi İstatistikleri */}
             <AirQualityStats data={result} />
 
