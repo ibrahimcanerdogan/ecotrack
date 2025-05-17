@@ -90,5 +90,4 @@ Bu proje MIT lisansı altında lisanslanmıştır. Daha fazla bilgi için `LICEN
 
 ## 📞 İletişim
 
-
-Proje Linki: [https://github.com/ibrahimcanerdogan/ecotrack](https://github.com/ibrahimcanerdogan/ecotrack)
+İbrahim Can Erdoğan - [ibrahimcan.erdogann@gmail.com](mailto:ibrahimcan.erdogann@gmail.com)
