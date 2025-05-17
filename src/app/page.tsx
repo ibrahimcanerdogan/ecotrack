@@ -217,7 +217,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">EcoTrack</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Hava Kalitesi Takibi</h1>
             <span className="text-2xl">🌱</span>
           </div>
           {result && recommendations && (

@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "EcoTrack - Hava Kalitesi Takibi",
-  description: "Türkiye'nin hava kalitesi takip uygulaması",
+  title: "Hava Kalitesi Takibi | Anlık Hava Durumu ve PM Değerleri",
+  description: "Türkiye'nin en kapsamlı hava kalitesi takip platformu. Anlık PM2.5, PM10 değerleri ve detaylı hava kalitesi analizi.",
 };
 
 export default function RootLayout({
