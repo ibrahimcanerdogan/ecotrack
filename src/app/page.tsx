@@ -21,7 +21,17 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import AirQualityReport from './components/AirQualityReport';
 import AirQualityStats from './components/AirQualityStats';
-import AirQualityMap from './components/AirQualityMap';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the map component with no SSR
+const AirQualityMap = dynamic(() => import('./components/AirQualityMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] w-full rounded-xl overflow-hidden border border-gray-200 shadow-lg relative flex items-center justify-center bg-gray-50">
+      <div className="text-gray-500">Harita yükleniyor...</div>
+    </div>
+  ),
+});
 
 export default function Home() {
   const [location, setLocation] = useState("");
@@ -39,33 +49,37 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState<{name: string; latitude: number; longitude: number}[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Dışarı tıklandığında önerileri kapat
   useEffect(() => {
+    if (!isMounted) return;
+
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
       }
     }
-    if (typeof window !== 'undefined') {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, []);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMounted]);
 
   // Favori konumları yükle
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setFavorites(getFavoriteLocations());
-    }
-  }, []);
+    if (!isMounted) return;
+    setFavorites(getFavoriteLocations());
+  }, [isMounted]);
 
   // Mevcut konum favori mi kontrol et
   useEffect(() => {
-    if (typeof window !== 'undefined' && currentCoords) {
-      setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
-    }
-  }, [currentCoords]);
+    if (!isMounted || !currentCoords) return;
+    setIsFavorite(isFavoriteLocation(currentCoords.latitude, currentCoords.longitude));
+  }, [isMounted, currentCoords]);
 
   // Konum önerilerini al
   const fetchSuggestions = async (query: string) => {

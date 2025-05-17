@@ -190,50 +190,69 @@ export async function getHistoricalAirQuality(lat: number, lon: number): Promise
 // Favori konumları localStorage'dan al
 export function getFavoriteLocations(): FavoriteLocation[] {
   if (typeof window === 'undefined') return [];
-  const favorites = localStorage.getItem('favoriteLocations');
-  return favorites ? JSON.parse(favorites) : [];
+  try {
+    const favorites = localStorage.getItem('favoriteLocations');
+    return favorites ? JSON.parse(favorites) : [];
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return [];
+  }
 }
 
 // Favori konum ekle
 export function addFavoriteLocation(location: FavoriteLocation): void {
-  const favorites = getFavoriteLocations();
-  
-  // Aynı koordinatlara sahip konum var mı kontrol et
-  const isDuplicate = favorites.some(f => 
-    Math.abs(f.latitude - location.latitude) < 0.01 && 
-    Math.abs(f.longitude - location.longitude) < 0.01
-  );
-
-  // Eğer aynı konum varsa, işlemi iptal et
-  if (isDuplicate) {
-    return;
+  if (typeof window === 'undefined') return;
+  try {
+    const favorites = getFavoriteLocations();
+    if (!favorites.some(fav => 
+      fav.latitude === location.latitude && 
+      fav.longitude === location.longitude
+    )) {
+      favorites.push(location);
+      localStorage.setItem('favoriteLocations', JSON.stringify(favorites));
+    }
+  } catch (error) {
+    console.error('Error writing to localStorage:', error);
   }
-
-  // Yeni konumu ekle
-  favorites.push({ 
-    ...location, 
-    lastUpdated: new Date().toISOString(),
-    displayName: location.displayName || location.name
-  });
-  localStorage.setItem('favoriteLocations', JSON.stringify(favorites));
 }
 
 // Favori konum sil
 export function removeFavoriteLocation(latitude: number, longitude: number): void {
-  const favorites = getFavoriteLocations();
-  const newFavorites = favorites.filter(f => 
-    !(f.latitude === latitude && f.longitude === longitude)
-  );
-  localStorage.setItem('favoriteLocations', JSON.stringify(newFavorites));
+  if (typeof window === 'undefined') return;
+  try {
+    const favorites = getFavoriteLocations();
+    const updatedFavorites = favorites.filter(fav => 
+      fav.latitude !== latitude || fav.longitude !== longitude
+    );
+    localStorage.setItem('favoriteLocations', JSON.stringify(updatedFavorites));
+  } catch (error) {
+    console.error('Error writing to localStorage:', error);
+  }
+}
+
+// Tüm favori konumları sil
+export function clearAllFavoriteLocations(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem('favoriteLocations');
+  } catch (error) {
+    console.error('Error clearing localStorage:', error);
+  }
 }
 
 // Konum favori mi kontrol et
 export function isFavoriteLocation(latitude: number, longitude: number): boolean {
-  const favorites = getFavoriteLocations();
-  return favorites.some(f => 
-    Number(f.latitude.toFixed(2)) === Number(latitude.toFixed(2)) && 
-    Number(f.longitude.toFixed(2)) === Number(longitude.toFixed(2))
-  );
+  if (typeof window === 'undefined') return false;
+  try {
+    const favorites = getFavoriteLocations();
+    return favorites.some(fav => 
+      fav.latitude === latitude && 
+      fav.longitude === longitude
+    );
+  } catch (error) {
+    console.error('Error checking favorite location:', error);
+    return false;
+  }
 }
 
 // Gelecek 24 saat için hava kalitesi tahminlerini al
@@ -260,9 +279,4 @@ export async function getAirQualityForecast(lat: number, lon: number): Promise<A
     console.error("Hava kalitesi tahmini alınamadı:", error);
     return null;
   }
-}
-
-// Tüm favori konumları sil
-export function clearAllFavoriteLocations(): void {
-  localStorage.removeItem('favoriteLocations');
 } 

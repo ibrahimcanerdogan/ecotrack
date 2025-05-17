@@ -1,8 +1,19 @@
+import dynamic from 'next/dynamic';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, ScaleControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AirQualityData } from '../api';
 import L from 'leaflet';
 import { useMemo } from 'react';
+
+// Dynamically import the map component with no SSR
+const MapComponent = dynamic(() => import('./MapComponent'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] w-full rounded-xl overflow-hidden border border-gray-200 shadow-lg relative flex items-center justify-center bg-gray-50">
+      <div className="text-gray-500">Harita yükleniyor...</div>
+    </div>
+  ),
+});
 
 // Marker ikonunu düzelt
 const icon = L.icon({
@@ -118,31 +129,7 @@ const AirQualityMap = ({ center, data, location }: AirQualityMapProps) => {
       </div>
 
       <div className="h-[500px] w-full rounded-xl overflow-hidden border border-gray-200 shadow-lg relative">
-        <MapContainer
-          center={center}
-          zoom={13}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={false}
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <ZoomControl position="bottomright" />
-          <ScaleControl position="bottomleft" />
-          <Marker position={center} icon={icon}>
-            <Popup
-              className="custom-popup"
-              closeButton={true}
-              closeOnClick={false}
-              autoPan={true}
-              maxWidth={300}
-            >
-              {popupContent}
-            </Popup>
-          </Marker>
-        </MapContainer>
+        <MapComponent center={center} data={data} location={location} />
       </div>
 
       <div className="mt-6">
